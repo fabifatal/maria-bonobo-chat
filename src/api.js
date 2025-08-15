@@ -1,17 +1,54 @@
+// src/api.js
 const API_URL = process.env.REACT_APP_API_URL;
 
-export async function getRevelaciones(token) {
-  const res = await fetch(`${API_URL}/revelaciones`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error('Error al cargar');
-  return res.json();
+function defaultHeaders() {
+  const headers = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  };
+  // Para Día 3 (auth): incluir Bearer si existe
+  const token = localStorage.getItem("token");
+  if (token) headers.Authorization = `Bearer ${token}`;
+  return headers;
 }
 
-export async function getRevelacionById(id, token) {
-  const res = await fetch(`${API_URL}/revelaciones/${id}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!res.ok) throw new Error('No encontrada');
-  return res.json();
+async function request(path, options = {}) {
+  try {
+    const res = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers: { ...defaultHeaders(), ...(options.headers || {}) },
+    });
+
+    const status = res.status;
+    let data = null;
+    try {
+      // puede fallar si la respuesta es vacía
+      data = await res.json();
+    } catch (_) {}
+
+    if (!res.ok) {
+      return {
+        data: null,
+        error: { message: data?.message || res.statusText || "Request error" },
+        status,
+      };
+    }
+
+    return { data, error: null, status };
+  } catch (err) {
+    return { data: null, error: { message: err.message }, status: 0 };
+  }
 }
+
+// --- Endpoints Día 2 (GET) ---
+export function getRevelaciones({ page, limit } = {}) {
+  // const qs =
+  //   page && limit ? `?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}` : "";
+  return request(`/revelaciones`);
+}
+
+export function getRevelacion(id) {
+  return request(`/revelaciones/${encodeURIComponent(id)}`);
+}
+
+// (Día 4 agregas: createRevelacion, updateRevelacion, deleteRevelacion)

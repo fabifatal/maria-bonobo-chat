@@ -1,30 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useAuth } from '../app/AuthContext';
-import { getRevelacionById } from '../api';
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { useRevelaciones } from "../app/RevelacionesContext";
 
-const RevelacionDetail = () => {
+export default function RevelacionDetail() {
   const { id } = useParams();
-  const { state } = useAuth();
-  const [item, setItem] = useState(null);
-  const [error, setError] = useState(null);
+  const { byId, loadById, loading, error } = useRevelaciones();
+  const [item, setItem] = useState(byId[id]);
 
   useEffect(() => {
-    if (!id || !state.token) return;
-    getRevelacionById(id, state.token)
-      .then(setItem)
-      .catch(() => setError('No se pudo cargar la revelación'));
-  }, [id, state.token]);
+    let mounted = true;
+    if (!byId[id]) {
+      loadById(id).then((data) => mounted && setItem(data));
+    } else {
+      setItem(byId[id]);
+    }
+    return () => {
+      mounted = false;
+    };
+  }, [id, byId, loadById]);
 
-  if (error) return <div role="alert">{error}</div>;
-  if (!item) return <div>Cargando…</div>;
+  if (loading && !item) return <p role="status">Cargando…</p>;
+  if (error && !item) return <p role="alert">Error: {error}</p>;
+  if (!item) return <p>No encontrada.</p>;
 
   return (
-    <main style={{ maxWidth: 720, margin: '0 auto', padding: 16 }}>
+    <div>
+      <p>
+        <Link to="/revelaciones">← Volver</Link>
+      </p>
       <h1>{item.title}</h1>
-      <pre>{JSON.stringify(item.messages, null, 2)}</pre>
-    </main>
-  );
-};
+      <p>
+        <small>{new Date(item.createdAt).toLocaleString()}</small>
+      </p>
 
-export default RevelacionDetail;
+      <h2>Mensajes</h2>
+      {!item.messages?.length ? (
+        <p>No hay mensajes en esta revelación.</p>
+      ) : (
+        <ul>
+          {item.messages.map((m, i) => (
+            <li key={`${m.role}-${m.ts ?? i}`}>...</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
