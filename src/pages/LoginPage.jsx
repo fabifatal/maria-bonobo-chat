@@ -25,11 +25,11 @@ const LoginPage = () => {
       <form onSubmit={onSubmit} style={{ display: 'grid', gap: 8 }}>
         <label>
           Email
-          <input value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <label>
           Password
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
         </label>
         {error && <div role="alert">{error}</div>}
         <button type="submit">Entrar</button>

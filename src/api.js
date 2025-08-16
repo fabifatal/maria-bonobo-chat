@@ -42,13 +42,19 @@ async function request(path, options = {}) {
 
 // --- Endpoints Día 2 (GET) ---
 export function getRevelaciones({ page, limit } = {}) {
-  // const qs =
-  //   page && limit ? `?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}` : "";
-  return request(`/revelaciones`);
+  const qs =
+    page && limit
+      ? `?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`
+      : "";
+  return request(`/revelaciones${qs}`);
 }
 
 export function getRevelacion(id) {
   return request(`/revelaciones/${encodeURIComponent(id)}`);
 }
 
-// (Día 4 agregas: createRevelacion, updateRevelacion, deleteRevelacion)
+export function getLogin(email, password) {
+  return request(`/users?email=${email}&password=${password}`, {
+    method: "GET",
+  });
+}
