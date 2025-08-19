@@ -5,7 +5,7 @@ import NewRevelacionForm from "../components/NewRevelacionForm";
 import RevelacionItemActions from "../components/RevelacionItemActions";
 
 export default function RevelacionesList() {
-  const { list, loading, error, loadList, operationStates } = useRevelaciones();
+  const { list, loadList, operationStates } = useRevelaciones();
   const [showNewForm, setShowNewForm] = useState(false);
 
   useEffect(() => {
