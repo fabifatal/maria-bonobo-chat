@@ -6,7 +6,6 @@ function defaultHeaders() {
     Accept: "application/json",
     "Content-Type": "application/json",
   };
-  // Para Día 3 (auth): incluir Bearer si existe
   const token = localStorage.getItem("token");
   if (token) headers.Authorization = `Bearer ${token}`;
   return headers;
@@ -22,7 +21,6 @@ async function request(path, options = {}) {
     const status = res.status;
     let data = null;
     try {
-      // puede fallar si la respuesta es vacía
       data = await res.json();
     } catch (_) {}
 
@@ -40,7 +38,6 @@ async function request(path, options = {}) {
   }
 }
 
-// --- Endpoints Día 2 (GET) ---
 export function getRevelaciones({ page, limit } = {}) {
   const qs =
     page && limit
@@ -56,5 +53,25 @@ export function getRevelacion(id) {
 export function getLogin(email, password) {
   return request(`/users?email=${email}&password=${password}`, {
     method: "GET",
+  });
+}
+
+export function postRevelacion(data) {
+  return request(`/revelaciones`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export function updateRevelacion(id, data) {
+  return request(`/revelaciones/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export function deleteRevelacion(id) {
+  return request(`/revelaciones/${encodeURIComponent(id)}`, {
+    method: "DELETE",
   });
 }
