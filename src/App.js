@@ -10,6 +10,7 @@ import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
 import RevelacionesList from "./pages/RevelacionesList";
 import RevelacionDetail from "./pages/RevelacionDetail";
+import RevelacionChatPage from "./pages/RevelacionChatPage";
 
 function App() {
   return (
@@ -31,14 +32,22 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/revelaciones/:id"
-                element={
-                  <ProtectedRoute>
-                    <RevelacionDetail />
-                  </ProtectedRoute>
-                }
-              />
+                        <Route
+            path="/revelaciones/:id"
+            element={
+              <ProtectedRoute>
+                <RevelacionDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/revelaciones/:id/chat"
+            element={
+              <ProtectedRoute>
+                <RevelacionChatPage />
+              </ProtectedRoute>
+            }
+          />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
