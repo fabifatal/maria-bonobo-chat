@@ -25,12 +25,25 @@ const LoginPage = () => {
 
   const passwordValid = useMemo(() => password.length >= pswmin, [password]);
 
-  const nombreValid = useMemo(() => !isLoginMode || nombre.trim().length > 0, [isLoginMode, nombre]);
+  const nombreValid = useMemo(() => {
+    // En modo login, el nombre no es requerido
+    if (isLoginMode) return true;
+    // En modo registro, el nombre debe tener al menos 1 carácter
+    return nombre.trim().length > 0;
+  }, [isLoginMode, nombre]);
 
-  const formValid = useMemo(
-    () => userValid && passwordValid && nombreValid,
-    [userValid, passwordValid, nombreValid]
-  );
+  const formValid = useMemo(() => {
+    const isValid = userValid && passwordValid && nombreValid;
+    console.log('Validación del formulario:', {
+      userValid,
+      passwordValid,
+      nombreValid,
+      isLoginMode,
+      nombre: nombre.trim(),
+      formValid: isValid
+    });
+    return isValid;
+  }, [userValid, passwordValid, nombreValid, isLoginMode, nombre]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,6 +72,8 @@ const LoginPage = () => {
     setEmail("");
     setPassword("");
     setNombre("");
+    // Resetear el estado de validación
+    setIsLoading(false);
   };
 
   return (
