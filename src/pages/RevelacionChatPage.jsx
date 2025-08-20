@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useRevelaciones } from '../app/RevelacionesContext';
 import { useToast } from '../app/ToastContext';
+import { sendMessage } from '../services/chatService';
 
 const RevelacionChatPage = () => {
   const { id } = useParams();
@@ -56,37 +57,63 @@ const RevelacionChatPage = () => {
     if (!input.trim()) return;
     
     const userMsg = { role: 'user', content: input.trim(), timestamp: Date.now() };
-    const userInput = input.trim();
     setInput('');
     
     // Agregar mensaje del usuario inmediatamente
     const newMsgs = [...msgs, userMsg];
     setMsgs(newMsgs);
     
-    // Simular respuesta del asistente (aquí podrías integrar con tu API real)
-    setTimeout(async () => {
-      const assistantMsg = { 
-        role: 'assistant', 
-        content: `Respuesta simulada a: "${userInput}"`, 
-        timestamp: Date.now() 
-      };
-      
-      const updatedMsgs = [...newMsgs, assistantMsg];
-      setMsgs(updatedMsgs);
-      
-      // Guardar todos los mensajes en la revelación
-      try {
-        await updateMessages(id, updatedMsgs);
-      } catch (error) {
-        showError("Error al guardar los mensajes");
-      }
-    }, 1000);
-    
     // Guardar mensaje del usuario
     try {
       await updateMessages(id, newMsgs);
     } catch (error) {
       showError("Error al guardar el mensaje");
+    }
+    
+    // Mostrar indicador de "escribiendo..."
+    setMsgs(prev => [...prev, { role: 'assistant', content: '...', timestamp: Date.now(), isTyping: true }]);
+    
+    try {
+      // Llamar a la API de chat
+      const result = await sendMessage(newMsgs);
+      
+      if (result.success) {
+        // Remover indicador de "escribiendo..." y agregar respuesta real
+        setMsgs(prev => prev.filter(msg => !msg.isTyping));
+        
+        const assistantMsg = { 
+          role: 'assistant', 
+          content: result.data.reply, 
+          timestamp: Date.now() 
+        };
+        
+        const updatedMsgs = [...newMsgs, assistantMsg];
+        setMsgs(updatedMsgs);
+        
+        // Guardar todos los mensajes en la revelación
+        await updateMessages(id, updatedMsgs);
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      // Remover indicador de "escribiendo..."
+      setMsgs(prev => prev.filter(msg => !msg.isTyping));
+      
+      // Mostrar mensaje de error
+      showError("Error al obtener respuesta: " + error.message);
+      
+      // Agregar mensaje de error del asistente
+      const errorMsg = { 
+        role: 'assistant', 
+        content: 'Lo siento, hubo un error al procesar tu mensaje. Inténtalo de nuevo.', 
+        timestamp: Date.now() 
+      };
+      
+      const updatedMsgs = [...newMsgs, errorMsg];
+      setMsgs(updatedMsgs);
+      
+      // Guardar mensajes incluyendo el error
+      await updateMessages(id, updatedMsgs);
     }
   };
 
@@ -220,10 +247,23 @@ const RevelacionChatPage = () => {
                 className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
                   m.role === 'user' 
                     ? 'bg-blue-600 text-white' 
+                    : m.isTyping
+                    ? 'bg-gray-200 text-gray-600'
                     : 'bg-gray-100 text-gray-900'
                 }`}
               >
-                {m.content}
+                {m.isTyping ? (
+                  <div className="flex items-center space-x-1">
+                    <span>María Bonobo está escribiendo</span>
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                  </div>
+                ) : (
+                  m.content
+                )}
               </div>
             </div>
           ))}
