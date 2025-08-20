@@ -22,6 +22,7 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('Lleuge')
     const { messages, stream } = req.body || {};
     if (!Array.isArray(messages) || !messages.length) {
       return res
@@ -36,27 +37,31 @@ export default async function handler(req, res) {
       "Evita política actual y contenido sexual explícito. Sé amable y creativa.",
     ].join(" ");
 
-    // Normaliza mensajes de cliente -> formato Responses API
-    const input = [
-      { role: "system", content: [{ type: "text", text: systemText }] },
+    // Normaliza mensajes para Chat Completions API
+    const chatMessages = [
+      { role: "system", content: systemText },
       ...messages.map((m) => ({
         role: m.role === "assistant" ? "assistant" : "user",
-        content: [
-          { type: "text", text: String(m.content || "").slice(0, 4000) },
-        ],
+        content: String(m.content || "").slice(0, 4000),
       })),
     ];
 
-    const model = process.env.OPENAI_MODEL || "gpt-5-mini";
+    const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
-    // Llamada al Responses API (no-stream por simplicidad del MVP)
+    // Llamada al Chat Completions API
+    console.log('Llamada a la API de OpenAI');
     const resp = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ model, input }),
+      body: JSON.stringify({ 
+        model, 
+        messages: chatMessages,
+        max_completion_tokens: 150,
+        temperature: 1
+      }),
     });
 
     const data = await resp.json();
@@ -65,11 +70,8 @@ export default async function handler(req, res) {
       return res.status(resp.status).json({ error: msg });
     }
 
-    // Conveniencia: Responses API suele incluir output_text
-    const reply =
-      data.output_text ??
-      (Array.isArray(data.output) && data.output[0]?.content?.[0]?.text) ??
-      "";
+    // Extraer la respuesta del Chat Completions API
+    const reply = data.choices?.[0]?.message?.content || "";
 
     return res
       .status(200)
