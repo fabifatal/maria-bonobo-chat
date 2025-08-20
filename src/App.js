@@ -6,7 +6,6 @@ import { RevelacionesProvider } from "./app/RevelacionesContext";
 import { ToastProvider } from "./app/ToastContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 
-import ChatPage from "./pages/ChatPage";
 import LoginPage from "./pages/LoginPage";
 import RevelacionesList from "./pages/RevelacionesList";
 import RevelacionDetail from "./pages/RevelacionDetail";
@@ -20,7 +19,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               {/* Público */}
-              <Route path="/" element={<ChatPage />} />
+              <Route path="/" element={<RevelacionChatPage />} />
               <Route path="/login" element={<LoginPage />} />
 
               {/* Protegido */}
