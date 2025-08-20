@@ -5,15 +5,82 @@ const AuthCtx = createContext({
   state: { user: null, token: null, loading: true },
   login: async () => {},
   logout: () => {},
+  clearToken: () => {},
+  isTokenValid: () => {},
 });
 
 export const AuthProvider = ({ children }) => {
   const [state, setState] = useState({ user: null, token: null, loading: true });
 
+  // Función para limpiar token y usuario
+  const clearToken = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setState({ user: null, token: null, loading: false });
+  };
+
+  // Función para verificar si el token es válido
+  const isTokenValid = (token) => {
+    if (!token) return false;
+    
+    // Para tokens de sesión simple, verificar formato básico
+    if (token.startsWith('session_')) {
+      // Extraer timestamp del token (formato: session_email_timestamp_random)
+      const parts = token.split('_');
+      if (parts.length >= 3) {
+        const timestamp = parseInt(parts[2]);
+        const currentTime = Date.now();
+        const tokenAge = currentTime - timestamp;
+        
+        // Token expira después de 24 horas (86400000 ms)
+        const maxAge = 24 * 60 * 60 * 1000;
+        
+        if (tokenAge > maxAge) {
+          console.log('Token expirado, limpiando...');
+          clearToken();
+          return false;
+        }
+        return true;
+      }
+    }
+    
+    return false;
+  };
+
+  // Función para limpiar token expirado
+  const cleanupExpiredToken = () => {
+    const token = localStorage.getItem('token');
+    if (token && !isTokenValid(token)) {
+      console.log('Limpiando token expirado...');
+      clearToken();
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
-    setState({ user: user ? JSON.parse(user) : null, token, loading: false });
+    
+    // Verificar si el token es válido antes de establecer el estado
+    if (token && isTokenValid(token)) {
+      setState({ 
+        user: user ? JSON.parse(user) : null, 
+        token, 
+        loading: false 
+      });
+    } else {
+      // Si el token no es válido, limpiarlo
+      if (token) {
+        clearToken();
+      } else {
+        setState({ user: null, token: null, loading: false });
+      }
+    }
+  }, []);
+
+  // Limpiar token expirado cada 5 minutos
+  useEffect(() => {
+    const interval = setInterval(cleanupExpiredToken, 5 * 60 * 1000);
+    return () => clearInterval(interval);
   }, []);
 
   const login = async (_email, _password) => {
@@ -33,13 +100,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    setState({ user: null, token: null, loading: false });
+    clearToken();
   };
 
   return (
-    <AuthCtx.Provider value={{ state, login, logout }}>{children}</AuthCtx.Provider>
+    <AuthCtx.Provider value={{ 
+      state, 
+      login, 
+      logout, 
+      clearToken, 
+      isTokenValid 
+    }}>
+      {children}
+    </AuthCtx.Provider>
   );
 };
 
