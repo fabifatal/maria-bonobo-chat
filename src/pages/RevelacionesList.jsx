@@ -6,7 +6,7 @@ import RevelacionItemActions from "../components/RevelacionItemActions";
 
 export default function RevelacionesList() {
   const { list, loadList, create, operationStates } = useRevelaciones();
-  const { state: authState } = useAuth();
+  const { state: authState, logout } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,6 +23,11 @@ export default function RevelacionesList() {
       // Ir directo al chat de la nueva conversación
       navigate(`/revelaciones/${result.data.id}/chat`);
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   // Si no hay usuario autenticado, mostrar mensaje
@@ -89,6 +94,50 @@ export default function RevelacionesList() {
   if (!list.length) {
     return (
       <>
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          {/* Header con logout */}
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Mis Conversaciones</h1>
+              <p className="text-gray-600 mt-1">
+                Bienvenido, {authState.user?.nombre || 'Usuario'}
+              </p>
+            </div>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={handleLogout}
+                className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+                title="Cerrar sesión"
+              >
+                <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Cerrar sesión
+              </button>
+              <button
+                onClick={handleCreateNewChat}
+                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium flex items-center"
+                disabled={operationStates.create.loading}
+              >
+                <svg
+                  className="w-4 h-4 mr-2"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+                {operationStates.create.loading ? "Creando..." : "Nueva conversación"}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <div className="text-center py-12">
           <div className="text-gray-400 mb-4">
             <svg className="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
@@ -116,7 +165,7 @@ export default function RevelacionesList() {
   return (
     <>
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Header con logout */}
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Mis Conversaciones</h1>
@@ -124,26 +173,38 @@ export default function RevelacionesList() {
               Bienvenido, {authState.user?.nombre || 'Usuario'}
             </p>
           </div>
-          <button
-            onClick={handleCreateNewChat}
-            className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium flex items-center"
-            disabled={operationStates.create.loading}
-          >
-            <svg
-              className="w-4 h-4 mr-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-colors"
+              title="Cerrar sesión"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4v16m8-8H4"
-              />
-            </svg>
-            {operationStates.create.loading ? "Creando..." : "Nueva conversación"}
-          </button>
+              <svg className="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Cerrar sesión
+            </button>
+            <button
+              onClick={handleCreateNewChat}
+              className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium flex items-center"
+              disabled={operationStates.create.loading}
+            >
+              <svg
+                className="w-4 h-4 mr-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              {operationStates.create.loading ? "Creando..." : "Nueva conversación"}
+            </button>
+          </div>
         </div>
 
         {/* Lista de conversaciones */}
