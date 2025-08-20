@@ -1,16 +1,20 @@
 import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useRevelaciones } from "../app/RevelacionesContext";
+import { useAuth } from "../app/AuthContext";
 import RevelacionItemActions from "../components/RevelacionItemActions";
 
 export default function RevelacionesList() {
   const { list, loadList, create, operationStates } = useRevelaciones();
+  const { state: authState } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // Solo cargar si hay un usuario autenticado
+    if (authState.userId && !authState.loading) {
+      loadList();
+    }
+  }, [loadList, authState.userId, authState.loading]);
 
   const handleCreateNewChat = async () => {
     const result = await create({ title: "Sin título" });
@@ -21,6 +25,31 @@ export default function RevelacionesList() {
     }
   };
 
+  // Si no hay usuario autenticado, mostrar mensaje
+  if (!authState.userId && !authState.loading) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-gray-400 mb-4">
+          <svg className="w-12 h-12 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+          </svg>
+        </div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Acceso requerido
+        </h2>
+        <p className="text-gray-600 mb-6">
+          Necesitas iniciar sesión para ver tus conversaciones
+        </p>
+        <Link
+          to="/login"
+          className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+        >
+          Ir al login
+        </Link>
+      </div>
+    );
+  }
+
   // Estados de renderizado
   if (operationStates.loadList.loading && !list.length) {
     return (
@@ -28,7 +57,7 @@ export default function RevelacionesList() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600" role="status">
-            Cargando revelaciones...
+            Cargando tus conversaciones...
           </p>
         </div>
       </div>
@@ -89,7 +118,12 @@ export default function RevelacionesList() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Revelaciones</h1>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Mis Conversaciones</h1>
+            <p className="text-gray-600 mt-1">
+              Bienvenido, {authState.user?.nombre || 'Usuario'}
+            </p>
+          </div>
           <button
             onClick={handleCreateNewChat}
             className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium flex items-center"
@@ -112,74 +146,31 @@ export default function RevelacionesList() {
           </button>
         </div>
 
-        {/* Lista de revelaciones */}
-        <div className="bg-white shadow rounded-lg overflow-hidden">
-          <ul className="divide-y divide-gray-200">
-            {list.map((revelacion, index) => (
-              <li
-                key={
-                  revelacion.id ??
-                  revelacion._id ??
-                  revelacion.uuid ??
-                  `${revelacion.title}-${revelacion.createdAt}-${index}`
-                }
-                className="p-6 hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex-1 min-w-0">
-                    <Link
-                      to={`/revelaciones/${revelacion.id}`}
-                      className="text-lg font-medium text-gray-900 hover:text-blue-600 transition-colors block truncate"
-                    >
-                      {revelacion.title}
-                    </Link>
-                    <div className="flex items-center mt-2 text-sm text-gray-500">
-                      <svg
-                        className="w-3 h-3 mr-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                        />
-                      </svg>
-                      {new Date(revelacion.createdAt).toLocaleString("es-ES", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Acciones */}
-                  <RevelacionItemActions revelacion={revelacion} />
+        {/* Lista de conversaciones */}
+        <div className="space-y-4">
+          {list.map((revelacion) => (
+            <div
+              key={`revelacion-${revelacion.id}`}
+              className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <Link
+                    to={`/revelaciones/${revelacion.id}/chat`}
+                    className="text-lg font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                  >
+                    {revelacion.title}
+                  </Link>
+                  <p className="text-sm text-gray-500 mt-1">
+                    {revelacion.messages?.length || 0} mensajes
+                  </p>
                 </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Indicador de carga para operaciones en segundo plano */}
-        {(operationStates.update.loading ||
-          operationStates.remove.loading) && (
-          <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-3 py-2 rounded-md shadow-lg text-sm">
-            <div className="flex items-center">
-              <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2"></div>
-              <span>
-                {operationStates.update.loading && "Actualizando..."}
-                {operationStates.remove.loading && "Eliminando..."}
-              </span>
+                <RevelacionItemActions revelacion={revelacion} />
+              </div>
             </div>
-          </div>
-        )}
+          ))}
+        </div>
       </div>
-
     </>
   );
 }

@@ -38,11 +38,23 @@ async function request(path, options = {}) {
   }
 }
 
-export function getRevelaciones({ page, limit } = {}) {
-  const qs =
-    page && limit
-      ? `?page=${encodeURIComponent(page)}&limit=${encodeURIComponent(limit)}`
-      : "";
+export function getRevelaciones({ page, limit, userId } = {}) {
+  let qs = "";
+  const params = [];
+  
+  if (page && limit) {
+    params.push(`page=${encodeURIComponent(page)}`);
+    params.push(`limit=${encodeURIComponent(limit)}`);
+  }
+  
+  if (userId) {
+    params.push(`userId=${encodeURIComponent(userId)}`);
+  }
+  
+  if (params.length > 0) {
+    qs = `?${params.join('&')}`;
+  }
+  
   return request(`/revelaciones${qs}`);
 }
 
@@ -64,9 +76,15 @@ export function postRegister(userData) {
 }
 
 export function postRevelacion(data) {
+  // Asegurar que siempre se incluya el userId
+  const revelacionData = {
+    ...data,
+    userId: data.userId || localStorage.getItem('userId')
+  };
+  
   return request(`/revelaciones`, {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(revelacionData),
   });
 }
 

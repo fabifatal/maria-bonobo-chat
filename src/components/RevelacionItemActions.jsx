@@ -40,7 +40,7 @@ export default function RevelacionItemActions({ revelacion }) {
         className="text-blue-600 hover:text-blue-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
         title="Continuar conversación"
       >
-        Continuar conversación
+        Continuar
       </button>
 
       {/* Botón Eliminar */}

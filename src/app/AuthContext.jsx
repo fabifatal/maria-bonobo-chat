@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { getLogin, postRegister } from '../api';
 
 const AuthCtx = createContext({
-  state: { user: null, token: null, loading: true },
+  state: { user: null, token: null, userId: null, loading: true },
   login: async () => {},
   register: async () => {},
   logout: () => {},
@@ -11,13 +11,14 @@ const AuthCtx = createContext({
 });
 
 export const AuthProvider = ({ children }) => {
-  const [state, setState] = useState({ user: null, token: null, loading: true });
+  const [state, setState] = useState({ user: null, token: null, userId: null, loading: true });
 
   // Función para limpiar token y usuario
   const clearToken = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    setState({ user: null, token: null, loading: false });
+    localStorage.removeItem('userId');
+    setState({ user: null, token: null, userId: null, loading: false });
   };
 
   // Función para verificar si el token es válido
@@ -60,12 +61,14 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     const user = localStorage.getItem('user');
+    const userId = localStorage.getItem('userId');
     
     // Verificar si el token es válido antes de establecer el estado
     if (token && isTokenValid(token)) {
       setState({ 
         user: user ? JSON.parse(user) : null, 
         token, 
+        userId,
         loading: false 
       });
     } else {
@@ -73,7 +76,7 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         clearToken();
       } else {
-        setState({ user: null, token: null, loading: false });
+        setState({ user: null, token: null, userId: null, loading: false });
       }
     }
   }, []);
@@ -92,12 +95,13 @@ export const AuthProvider = ({ children }) => {
     if (error) throw error;
     if (!data) throw new Error('No se pudo obtener el token');
     if (data.length === 0) throw new Error('Credenciales inválidas');
-    const { email, nombre } = data[0];
+    const { email, nombre, id } = data[0];
     // For MVP, create a simple session token (not JWT)
     const sessionToken = `session_${email}_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
     localStorage.setItem('token', sessionToken);
-    localStorage.setItem('user', JSON.stringify({ id: 'u1', email, nombre }));
-    setState({ user: { id: 'u1', email, nombre }, token: sessionToken, loading: false });
+    localStorage.setItem('user', JSON.stringify({ id, email, nombre }));
+    localStorage.setItem('userId', id);
+    setState({ user: { id, email, nombre }, token: sessionToken, userId: id, loading: false });
   };
 
   const register = async (_email, _password, _nombre) => {
