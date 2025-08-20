@@ -19,10 +19,17 @@ function App() {
           <BrowserRouter>
             <Routes>
               {/* Público */}
-              <Route path="/" element={<RevelacionChatPage />} />
               <Route path="/login" element={<LoginPage />} />
 
               {/* Protegido */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute>
+                    <RevelacionChatPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/revelaciones"
                 element={
@@ -31,22 +38,22 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-                        <Route
-            path="/revelaciones/:id"
-            element={
-              <ProtectedRoute>
-                <RevelacionDetail />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/revelaciones/:id/chat"
-            element={
-              <ProtectedRoute>
-                <RevelacionChatPage />
-              </ProtectedRoute>
-            }
-          />
+              <Route
+                path="/revelaciones/:id"
+                element={
+                  <ProtectedRoute>
+                    <RevelacionDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/revelaciones/:id/chat"
+                element={
+                  <ProtectedRoute>
+                    <RevelacionChatPage />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Fallback */}
               <Route path="*" element={<Navigate to="/" replace />} />
