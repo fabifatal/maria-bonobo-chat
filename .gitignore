@@ -24,3 +24,4 @@ yarn-error.log*
 
 # ignorar package-lock.json
 package-lock.json
+.vercel

@@ -1,10 +1,12 @@
 import React, { createContext, useContext, useMemo, useState } from "react";
 import { getRevelaciones, getRevelacion, postRevelacion, updateRevelacion as updateRevelacionAPI, deleteRevelacion as deleteRevelacionAPI } from "../api";
 import { useCallback } from "react";
+import { useAuth } from "./AuthContext";
 
 const Ctx = createContext(null);
 
 export function RevelacionesProvider({ children }) {
+  const { state: authState } = useAuth();
   const [list, setList] = useState([]);
   const [byId, setById] = useState({});
   const [loading, setLoading] = useState(false);
@@ -27,9 +29,16 @@ export function RevelacionesProvider({ children }) {
   }, []);
 
   const loadList = useCallback(async () => {
+    // Solo cargar si hay un usuario autenticado
+    if (!authState.userId) {
+      setList([]);
+      setById({});
+      return;
+    }
+
     setLoading(true);
     setOperationState('loadList', { loading: true, error: null });
-    const { data, error } = await getRevelaciones();
+    const { data, error } = await getRevelaciones({ userId: authState.userId });
     if (error) {
       setOperationState('loadList', { loading: false, error: error.message });
       setError(error.message);
@@ -47,7 +56,12 @@ export function RevelacionesProvider({ children }) {
       setOperationState('loadList', { loading: false, error: null });
     }
     setLoading(false);
-  }, [setOperationState]);
+  }, [authState.userId, setOperationState]);
+
+  // Recargar la lista cuando cambie el userId
+  React.useEffect(() => {
+    loadList();
+  }, [loadList]);
 
   const loadById = useCallback(
     async (id) => {
@@ -75,9 +89,19 @@ export function RevelacionesProvider({ children }) {
   );
 
   const create = useCallback(async (data) => {
+    // Asegurar que se incluya el userId del usuario autenticado
+    if (!authState.userId) {
+      throw new Error('Usuario no autenticado');
+    }
+
+    const revelacionData = {
+      ...data,
+      userId: authState.userId
+    };
+
     setLoading(true);
     setOperationState('create', { loading: true, error: null });
-    const { data: newRevelacion, error } = await postRevelacion(data);
+    const { data: newRevelacion, error } = await postRevelacion(revelacionData);
     if (error) {
       setOperationState('create', { loading: false, error: error.message });
       setError(error.message);
@@ -85,15 +109,19 @@ export function RevelacionesProvider({ children }) {
       return { success: false, error: error.message };
     }
     if (newRevelacion) {
-      // Sync cache: add to list and byId
-      setList((prev) => [...prev, newRevelacion]);
-      setById((prev) => ({ ...prev, [newRevelacion.id]: newRevelacion }));
+      // Verificar que no exista ya en la lista para evitar duplicados
+      const exists = list.some(item => item.id === newRevelacion.id);
+      if (!exists) {
+        // Sync cache: add to list and byId
+        setList((prev) => [...prev, newRevelacion]);
+        setById((prev) => ({ ...prev, [newRevelacion.id]: newRevelacion }));
+      }
       setOperationState('create', { loading: false, error: null });
       setLoading(false);
       return { success: true, data: newRevelacion };
     }
     setLoading(false);
-  }, [setOperationState]);
+  }, [authState.userId, setOperationState, list]);
 
   const update = useCallback(async (id, data) => {
     setLoading(true);
