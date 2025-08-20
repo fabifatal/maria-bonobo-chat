@@ -1,0 +1,81 @@
+{
+  "band": {
+    "bio": "María Bonobo es una banda chilena (2015) de electro pop ecléctico, shows performáticos y discurso crítico. Publican el EP homónimo (2017), el EP 'La Vida Bonoba' (2019) y 'Al Unísono' (2023).",
+    "links": {
+      "wikipedia": "https://es.wikipedia.org/wiki/Mar%C3%ADa_Bonobo",
+      "spotify": "https://open.spotify.com/artist/4Tt2bnIXHMB1oSsQf3eO3T",
+      "bandcamp": "https://mariabonobo.bandcamp.com"
+    }
+  },
+  "songs": [
+    {
+      "title": "Feliz (feat. Ignacio Redard)",
+      "year": 2019,
+      "mood": ["enérgico", "pop"],
+      "themes": ["deseo", "ambivalencia"],
+      "snippet_10w": "Eres tú quien sabe qué me hace feliz",
+      "url": "https://mariabonobo.bandcamp.com/album/la-vida-bonoba-2",
+      "sources": ["wikipedia", "bandcamp_album_lavida"]
+    },
+    {
+      "title": "Tu Té",
+      "year": 2019,
+      "mood": ["nostálgico", "íntimo"],
+      "themes": ["recuerdos", "melancolía"],
+      "snippet_10w": "Nadie podrá tomar tu té, tomar tu té",
+      "url": "https://mariabonobo.bandcamp.com/album/la-vida-bonoba-2",
+      "sources": ["bandcamp_album_lavida"]
+    },
+    {
+      "title": "Nuestra Histeria",
+      "year": 2019,
+      "mood": ["intenso", "ritual"],
+      "themes": ["cuerpo", "denuncia"],
+      "snippet_10w": "Esta histeria no es más que la injusticia que vomito",
+      "url": "https://mariabonobo.bandcamp.com/album/la-vida-bonoba-2",
+      "notes": "La canción experimenta con reguetón y rock.",
+      "sources": ["wikipedia", "bandcamp_album_lavida"]
+    },
+    {
+      "title": "Fe",
+      "year": 2019,
+      "mood": ["esperanzador", "balada"],
+      "themes": ["fe", "resiliencia"],
+      "snippet_10w": "Cómo podría rendirme si hay una posibilidad",
+      "url": "https://mariabonobo.bandcamp.com/album/la-vida-bonoba-2",
+      "sources": ["bandcamp_album_lavida"]
+    },
+    {
+      "title": "Alas Rotas",
+      "year": 2021,
+      "mood": ["catártico", "pop-rock"],
+      "themes": ["liberación", "autonomía"],
+      "snippet_10w": "Voy a volar muy lejos, lejos de ti, tan lejos",
+      "url": "https://mariabonobo.bandcamp.com/track/alas-rotas",
+      "sources": ["bandcamp_alasrotas"]
+    },
+    {
+      "title": "Rabia",
+      "year": 2021,
+      "mood": ["furioso", "oscuro"],
+      "themes": ["ruptura", "empoderamiento"],
+      "snippet_10w": "Si me rompiste el corazón, qué puedo hacer",
+      "url": "https://mariabonobo.bandcamp.com/track/rabia",
+      "sources": ["bandcamp_rabia"]
+    }
+  ],
+  "facts": [
+    "Banda formada en 2015 (Chile).",
+    "EP 'María Bonobo' (2017) incluye 'Femicidio en la Alameda' y un remix de Pedro Frugone.",
+    "'La Vida Bonoba' (2019) producido/mezclado por Pedro Frugone; colaboración con Ignacio Redard en 'Feliz'.",
+    "'Nuestra Histeria' explora cruces entre reguetón y rock."
+  ],
+  "source_map": {
+    "wikipedia": "https://es.wikipedia.org/wiki/Mar%C3%ADa_Bonobo",
+    "spotify_artist": "https://open.spotify.com/artist/4Tt2bnIXHMB1oSsQf3eO3T",
+    "bandcamp_album_2017": "https://mariabonobo.bandcamp.com/album/mar-a-bonobo",
+    "bandcamp_album_lavida": "https://mariabonobo.bandcamp.com/album/la-vida-bonoba-2",
+    "bandcamp_alasrotas": "https://mariabonobo.bandcamp.com/track/alas-rotas",
+    "bandcamp_rabia": "https://mariabonobo.bandcamp.com/track/rabia"
+  }
+}
