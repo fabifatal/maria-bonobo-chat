@@ -56,6 +56,13 @@ export function getLogin(email, password) {
   });
 }
 
+export function postRegister(userData) {
+  return request(`/users`, {
+    method: "POST",
+    body: JSON.stringify(userData),
+  });
+}
+
 export function postRevelacion(data) {
   return request(`/revelaciones`, {
     method: "POST",

@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getLogin } from '../api';
+import { getLogin, postRegister } from '../api';
 
 const AuthCtx = createContext({
   state: { user: null, token: null, loading: true },
   login: async () => {},
+  register: async () => {},
   logout: () => {},
   clearToken: () => {},
   isTokenValid: () => {},
@@ -99,6 +100,26 @@ export const AuthProvider = ({ children }) => {
     setState({ user: { id: 'u1', email, nombre }, token: sessionToken, loading: false });
   };
 
+  const register = async (_email, _password, _nombre) => {
+    try {
+      // MVP stub: reemplazar por Auth real en el Día 3
+      const { data, error } = await postRegister({
+        email: _email,
+        password: _password,
+        nombre: _nombre
+      });
+      
+      if (error) throw error;
+      if (!data) throw new Error('No se pudo crear la cuenta');
+      
+      // Después del registro exitoso, hacer login automáticamente
+      await login(_email, _password);
+    } catch (err) {
+      console.error('Error en registro:', err);
+      throw err;
+    }
+  };
+
   const logout = () => {
     clearToken();
   };
@@ -107,6 +128,7 @@ export const AuthProvider = ({ children }) => {
     <AuthCtx.Provider value={{ 
       state, 
       login, 
+      register,
       logout, 
       clearToken, 
       isTokenValid 

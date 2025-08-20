@@ -5,10 +5,12 @@ import { useAuth } from "../app/AuthContext";
 const pswmin = process.env.PASSWORD_MIN_LENGTH || 4;
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, register } = useAuth();
   const nav = useNavigate();
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [nombre, setNombre] = useState("");
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,12 +25,14 @@ const LoginPage = () => {
 
   const passwordValid = useMemo(() => password.length >= pswmin, [password]);
 
+  const nombreValid = useMemo(() => !isLoginMode || nombre.trim().length > 0, [isLoginMode, nombre]);
+
   const formValid = useMemo(
-    () => userValid && passwordValid,
-    [userValid, passwordValid]
+    () => userValid && passwordValid && nombreValid,
+    [userValid, passwordValid, nombreValid]
   );
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formValid || isLoading) return;
 
@@ -36,13 +40,25 @@ const LoginPage = () => {
     setError(null);
 
     try {
-      await login(email, password);
+      if (isLoginMode) {
+        await login(email, password);
+      } else {
+        await register(email, password, nombre);
+      }
       nav("/revelaciones");
     } catch (err) {
-      setError("Credenciales inválidas");
+      setError(isLoginMode ? "Credenciales inválidas" : "Error al crear la cuenta");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const toggleMode = () => {
+    setIsLoginMode(!isLoginMode);
+    setError(null);
+    setEmail("");
+    setPassword("");
+    setNombre("");
   };
 
   return (
@@ -64,15 +80,55 @@ const LoginPage = () => {
             </svg>
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Bienvenido de vuelta
+            {isLoginMode ? "Bienvenido de vuelta" : "Crear cuenta"}
           </h2>
-          <p className="text-gray-600">Inicia sesión en tu cuenta</p>
+          <p className="text-gray-600">
+            {isLoginMode ? "Inicia sesión en tu cuenta" : "Únete a nuestra comunidad"}
+          </p>
         </div>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-6 shadow-lg rounded-lg sm:px-10">
-          <form onSubmit={onSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Campo Nombre (solo en modo registro) */}
+            {!isLoginMode && (
+              <div>
+                <label
+                  htmlFor="nombre"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Nombre completo
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg
+                      className="h-5 w-5 text-gray-400"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </div>
+                  <input
+                    id="nombre"
+                    name="nombre"
+                    type="text"
+                    autoComplete="name"
+                    required
+                    value={nombre}
+                    onChange={(e) => setNombre(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                    placeholder="Tu nombre completo"
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Campo Email */}
             <div>
               <label
@@ -141,7 +197,7 @@ const LoginPage = () => {
                   id="password"
                   name="password"
                   type="password"
-                  autoComplete="current-password"
+                  autoComplete={isLoginMode ? "current-password" : "new-password"}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -218,19 +274,33 @@ const LoginPage = () => {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                    Iniciando sesión...
+                    {isLoginMode ? "Iniciando sesión..." : "Creando cuenta..."}
                   </div>
                 ) : (
-                  "Iniciar sesión"
+                  isLoginMode ? "Iniciar sesión" : "Crear cuenta"
                 )}
               </button>
             </div>
           </form>
 
+          {/* Cambiar entre login y registro */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              {isLoginMode ? "¿No tienes una cuenta?" : "¿Ya tienes una cuenta?"}
+              <button
+                type="button"
+                onClick={toggleMode}
+                className="ml-1 text-blue-600 hover:text-blue-500 font-medium focus:outline-none focus:underline"
+              >
+                {isLoginMode ? "Regístrate aquí" : "Inicia sesión aquí"}
+              </button>
+            </p>
+          </div>
+
           {/* Información adicional */}
           <div className="mt-6 text-center">
             <p className="text-xs text-gray-500">
-              Al iniciar sesión, aceptas nuestros términos de servicio y
+              Al {isLoginMode ? "iniciar sesión" : "crear una cuenta"}, aceptas nuestros términos de servicio y
               política de privacidad
             </p>
           </div>
