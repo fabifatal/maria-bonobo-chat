@@ -58,6 +58,11 @@ export function getRevelaciones({ page, limit, userId } = {}) {
   return request(`/revelaciones${qs}`);
 }
 
+// Función específica para obtener revelaciones por usuario que maneja mejor los 404
+export function getUserRevelaciones(userId) {
+  return request(`/revelaciones?userId=${encodeURIComponent(userId)}`);
+}
+
 export function getRevelacion(id) {
   return request(`/revelaciones/${encodeURIComponent(id)}`);
 }
