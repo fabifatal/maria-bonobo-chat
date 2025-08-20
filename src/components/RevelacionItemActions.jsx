@@ -9,8 +9,8 @@ export default function RevelacionItemActions({ revelacion }) {
   const navigate = useNavigate();
   const { showSuccess, showError } = useToast();
 
-  const handleEdit = () => {
-    navigate(`/revelaciones/${revelacion.id}`);
+  const handleContinueChat = () => {
+    navigate(`/revelaciones/${revelacion.id}/chat`);
   };
 
   const handleDelete = async () => {
@@ -34,13 +34,13 @@ export default function RevelacionItemActions({ revelacion }) {
 
   return (
     <div className="flex items-center space-x-2">
-      {/* Botón Editar */}
+      {/* Botón Continuar conversación */}
       <button
-        onClick={handleEdit}
+        onClick={handleContinueChat}
         className="text-blue-600 hover:text-blue-800 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
-        title="Editar revelación"
+        title="Continuar conversación"
       >
-        Editar
+        Continuar conversación
       </button>
 
       {/* Botón Eliminar */}

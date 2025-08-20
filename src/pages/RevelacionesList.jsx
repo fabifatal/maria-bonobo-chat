@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { useRevelaciones } from "../app/RevelacionesContext";
-import NewRevelacionForm from "../components/NewRevelacionForm";
 import RevelacionItemActions from "../components/RevelacionItemActions";
 
 export default function RevelacionesList() {
-  const { list, loadList, operationStates } = useRevelaciones();
-  const [showNewForm, setShowNewForm] = useState(false);
+  const { list, loadList, create, operationStates } = useRevelaciones();
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadList();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleShowNewForm = () => {
-    setShowNewForm(true);
-  };
-
-  const handleCloseNewForm = () => {
-    setShowNewForm(false);
+  const handleCreateNewChat = async () => {
+    const result = await create({ title: "Sin título" });
+    
+    if (result.success) {
+      // Ir directo al chat de la nueva conversación
+      navigate(`/revelaciones/${result.data.id}/chat`);
+    }
   };
 
   // Estados de renderizado
@@ -73,15 +73,13 @@ export default function RevelacionesList() {
             Comienza creando tu primera conversación
           </p>
           <button
-            onClick={handleShowNewForm}
+            onClick={handleCreateNewChat}
             className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+            disabled={operationStates.create.loading}
           >
-            Crear primera conversación
+            {operationStates.create.loading ? "Creando..." : "Crear primera conversación"}
           </button>
         </div>
-
-        {/* Formulario de nueva revelación */}
-        {showNewForm && <NewRevelacionForm onClose={handleCloseNewForm} />}
       </>
     );
   }
@@ -93,8 +91,9 @@ export default function RevelacionesList() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Revelaciones</h1>
           <button
-            onClick={handleShowNewForm}
+            onClick={handleCreateNewChat}
             className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium flex items-center"
+            disabled={operationStates.create.loading}
           >
             <svg
               className="w-4 h-4 mr-2"
@@ -109,7 +108,7 @@ export default function RevelacionesList() {
                 d="M12 4v16m8-8H4"
               />
             </svg>
-            Nueva revelación
+            {operationStates.create.loading ? "Creando..." : "Nueva conversación"}
           </button>
         </div>
 
@@ -167,14 +166,12 @@ export default function RevelacionesList() {
         </div>
 
         {/* Indicador de carga para operaciones en segundo plano */}
-        {(operationStates.create.loading ||
-          operationStates.update.loading ||
+        {(operationStates.update.loading ||
           operationStates.remove.loading) && (
           <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-3 py-2 rounded-md shadow-lg text-sm">
             <div className="flex items-center">
               <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2"></div>
               <span>
-                {operationStates.create.loading && "Creando..."}
                 {operationStates.update.loading && "Actualizando..."}
                 {operationStates.remove.loading && "Eliminando..."}
               </span>
@@ -183,8 +180,6 @@ export default function RevelacionesList() {
         )}
       </div>
 
-      {/* Formulario de nueva revelación */}
-      {showNewForm && <NewRevelacionForm onClose={handleCloseNewForm} />}
     </>
   );
 }
