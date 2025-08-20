@@ -6,12 +6,10 @@ import { useToast } from '../app/ToastContext';
 const RevelacionChatPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { byId, loadById, update, operationStates } = useRevelaciones();
+  const { byId, loadById, update, updateMessages, operationStates } = useRevelaciones();
   const { showSuccess, showError } = useToast();
   
-  const [msgs, setMsgs] = useState([
-    { role: 'assistant', content: 'Soy María Bonobo. ¿Qué alma canta hoy? ✨' },
-  ]);
+  const [msgs, setMsgs] = useState([]);
   const [input, setInput] = useState('');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [title, setTitle] = useState('');
@@ -24,26 +22,72 @@ const RevelacionChatPage = () => {
         if (mounted && data) {
           setItem(data);
           setTitle(data.title);
+          // Cargar mensajes existentes o inicializar con mensaje de bienvenida
+          if (data.messages && data.messages.length > 0) {
+            setMsgs(data.messages);
+          } else {
+            const welcomeMsg = { role: 'assistant', content: 'Soy María Bonobo. ¿Qué alma canta hoy? ✨' };
+            setMsgs([welcomeMsg]);
+            // Guardar mensaje de bienvenida
+            updateMessages(id, [welcomeMsg]);
+          }
         }
       });
     } else {
       setItem(byId[id]);
       setTitle(byId[id].title);
+      // Cargar mensajes existentes o inicializar con mensaje de bienvenida
+      if (byId[id].messages && byId[id].messages.length > 0) {
+        setMsgs(byId[id].messages);
+      } else {
+        const welcomeMsg = { role: 'assistant', content: 'Soy María Bonobo. ¿Qué alma canta hoy? ✨' };
+        setMsgs([welcomeMsg]);
+        // Guardar mensaje de bienvenida
+        updateMessages(id, [welcomeMsg]);
+      }
     }
     return () => {
       mounted = false;
     };
-  }, [id, byId, loadById]);
+  }, [id, byId, loadById, updateMessages]);
 
   const send = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
     
-    const userMsg = { role: 'user', content: input };
-    const assistantMsg = { role: 'assistant', content: 'respuesta simulada.' };
-    
-    setMsgs((m) => [...m, userMsg, assistantMsg]);
+    const userMsg = { role: 'user', content: input.trim(), timestamp: Date.now() };
+    const userInput = input.trim();
     setInput('');
+    
+    // Agregar mensaje del usuario inmediatamente
+    const newMsgs = [...msgs, userMsg];
+    setMsgs(newMsgs);
+    
+    // Simular respuesta del asistente (aquí podrías integrar con tu API real)
+    setTimeout(async () => {
+      const assistantMsg = { 
+        role: 'assistant', 
+        content: `Respuesta simulada a: "${userInput}"`, 
+        timestamp: Date.now() 
+      };
+      
+      const updatedMsgs = [...newMsgs, assistantMsg];
+      setMsgs(updatedMsgs);
+      
+      // Guardar todos los mensajes en la revelación
+      try {
+        await updateMessages(id, updatedMsgs);
+      } catch (error) {
+        showError("Error al guardar los mensajes");
+      }
+    }, 1000);
+    
+    // Guardar mensaje del usuario
+    try {
+      await updateMessages(id, newMsgs);
+    } catch (error) {
+      showError("Error al guardar el mensaje");
+    }
   };
 
   const handleTitleSave = async () => {
@@ -192,12 +236,14 @@ const RevelacionChatPage = () => {
             aria-label="Escribe un mensaje"
             className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Escribe tu mensaje..."
+            disabled={operationStates.update.loading}
           />
           <button 
             type="submit"
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={operationStates.update.loading}
           >
-            Enviar
+            {operationStates.update.loading ? "Guardando..." : "Enviar"}
           </button>
         </form>
       </div>
@@ -207,7 +253,7 @@ const RevelacionChatPage = () => {
         <div className="fixed bottom-4 right-4 bg-blue-600 text-white px-3 py-2 rounded-md shadow-lg text-sm">
           <div className="flex items-center">
             <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white mr-2"></div>
-            <span>Guardando título...</span>
+            <span>Guardando...</span>
           </div>
         </div>
       )}

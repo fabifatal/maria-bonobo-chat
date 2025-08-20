@@ -120,6 +120,31 @@ export function RevelacionesProvider({ children }) {
     setLoading(false);
   }, [setOperationState]);
 
+  const updateMessages = useCallback(async (id, messages) => {
+    setLoading(true);
+    setOperationState('update', { loading: true, error: null });
+    const { data: updatedRevelacion, error } = await updateRevelacionAPI(id, { messages });
+    if (error) {
+      setOperationState('update', { loading: false, error: error.message });
+      setError(error.message);
+      setLoading(false);
+      return { success: false, error: error.message };
+    }
+    if (updatedRevelacion) {
+      // Sync cache: update in list and byId
+      setList((prev) => 
+        prev.map((item) => 
+          item.id === id ? updatedRevelacion : item
+        )
+      );
+      setById((prev) => ({ ...prev, [id]: updatedRevelacion }));
+      setOperationState('update', { loading: false, error: null });
+      setLoading(false);
+      return { success: true, data: updatedRevelacion };
+    }
+    setLoading(false);
+  }, [setOperationState]);
+
   const remove = useCallback(async (id) => {
     setLoading(true);
     setOperationState('remove', { loading: true, error: null });
@@ -161,6 +186,7 @@ export function RevelacionesProvider({ children }) {
       loadById, 
       create, 
       update, 
+      updateMessages,
       remove,
       createRevelacion, 
       updateRevelacion, 
@@ -176,6 +202,7 @@ export function RevelacionesProvider({ children }) {
       loadById, 
       create, 
       update, 
+      updateMessages,
       remove,
       createRevelacion, 
       updateRevelacion, 
