@@ -15,8 +15,6 @@ Una aplicación de chat interactiva que simula conversaciones con "María Bonobo
 
 - **Node.js** versión 18.0.0 o superior
 - **npm** versión 8.0.0 o superior
-- **Cuenta de OpenAI** con API key válida
-- **Git** para clonar el repositorio
 
 ## 🛠️ Instalación
 
@@ -38,15 +36,13 @@ npm install
 ```bash
 # Modo desarrollo
 npm start
-
-
+```
 La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
 
-## 🏗️ Arquitectura de la Aplicación
+## Arquitectura de la Aplicación
 
 ### Estructura de Directorios
 
-```
 src/
 ├── app/                    # Contextos de React (estado global)
 │   ├── AuthContext.jsx    # Manejo de autenticación
@@ -56,6 +52,7 @@ src/
 ├── pages/                # Páginas principales de la aplicación
 ├── services/             # Servicios de API
 └── api.js               # Configuración de API
+
 ```
 
 ### Flujo de la Aplicación
