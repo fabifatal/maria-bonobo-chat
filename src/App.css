@@ -2,37 +2,163 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Variables de colores del tema María Bonobo */
+:root {
+  --primary-pink: #ec4899; /* Pink-500 - Rosa vibrante principal */
+  --primary-pink-dark: #be185d; /* Pink-600 - Rosa oscuro para hover */
+  --primary-pink-light: #fce7f3; /* Pink-100 - Rosa claro para fondos */
+  --accent-pink: #f472b6; /* Pink-400 - Rosa acento */
+  --text-white: #ffffff;
+  --text-dark: #1f2937;
+  --bg-light: #fdf2f8; /* Pink-50 - Fondo muy claro */
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/* Estilos globales de la aplicación */
+body {
+  background-color: var(--bg-light);
+  color: var(--text-dark);
 }
 
+/* Header principal */
 .App-header {
-  background-color: #282c34;
+  background: linear-gradient(135deg, var(--primary-pink) 0%, var(--accent-pink) 100%);
+  color: var(--text-white);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
 }
 
+/* Botones con tema rosado */
+.btn-primary {
+  background-color: var(--primary-pink);
+  color: var(--text-white);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-pink-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+}
+
+.btn-secondary {
+  background-color: var(--primary-pink-light);
+  color: var(--primary-pink-dark);
+  border: 2px solid var(--primary-pink);
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary-pink);
+  color: var(--text-white);
+}
+
+/* Enlaces con tema rosado */
 .App-link {
-  color: #61dafb;
+  color: var(--primary-pink);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.App-link:hover {
+  color: var(--primary-pink-dark);
+  text-decoration: underline;
+}
+
+/* Cards y contenedores */
+.card {
+  background-color: var(--text-white);
+  border: 1px solid var(--primary-pink-light);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(236, 72, 153, 0.1);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.2);
+  transform: translateY(-2px);
+}
+
+/* Inputs y formularios */
+input, textarea, select {
+  border: 2px solid var(--primary-pink-light);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-pink);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.1);
+}
+
+/* Navegación */
+.nav-link {
+  color: var(--text-dark);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  background-color: var(--primary-pink-light);
+  color: var(--primary-pink-dark);
+}
+
+/* Estados de carga y éxito */
+.loading {
+  color: var(--primary-pink);
+}
+
+.success {
+  color: #10b981; /* Green-500 */
+  background-color: #d1fae5; /* Green-100 */
+}
+
+.error {
+  color: #ef4444; /* Red-500 */
+  background-color: #fee2e2; /* Red-100 */
+}
+
+/* Animaciones suaves */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Responsive y accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
-  to {
-    transform: rotate(360deg);
+}
+
+@media (max-width: 768px) {
+  .card {
+    padding: 1rem;
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
   }
 }
