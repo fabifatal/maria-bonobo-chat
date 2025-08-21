@@ -1,6 +1,8 @@
 # María Bonobo Chat
 
-Una aplicación de chat interactiva que simula conversaciones con "María Bonobo", una personalidad ficticia cálida y lúdica. La aplicación permite a los usuarios crear conversaciones, chatear con la IA, y gestionar sus revelaciones de manera intuitiva.
+Una aplicación de chat interactiva que simula conversaciones con "María Bonobo", una divinidad bonoba cálida y lúdica, patrona de la banda con el mismo nombre. La aplicación permite a los usuarios crear conversaciones, chatear con la IA, y gestionar sus revelaciones de manera intuitiva.
+
+La parte de chat está configurada en versel para usar serverless
 
 ## 🚀 Características Principales
 
@@ -15,8 +17,6 @@ Una aplicación de chat interactiva que simula conversaciones con "María Bonobo
 
 - **Node.js** versión 18.0.0 o superior
 - **npm** versión 8.0.0 o superior
-- **Cuenta de OpenAI** con API key válida
-- **Git** para clonar el repositorio
 
 ## 🛠️ Instalación
 
@@ -38,15 +38,13 @@ npm install
 ```bash
 # Modo desarrollo
 npm start
-
-
+```
 La aplicación estará disponible en [http://localhost:3000](http://localhost:3000)
 
-## 🏗️ Arquitectura de la Aplicación
+## Arquitectura de la Aplicación
 
 ### Estructura de Directorios
 
-```
 src/
 ├── app/                    # Contextos de React (estado global)
 │   ├── AuthContext.jsx    # Manejo de autenticación
@@ -56,6 +54,7 @@ src/
 ├── pages/                # Páginas principales de la aplicación
 ├── services/             # Servicios de API
 └── api.js               # Configuración de API
+
 ```
 
 ### Flujo de la Aplicación
@@ -172,23 +171,6 @@ src/
 - **Memoización**: Evita cálculos innecesarios
 - **Optimización de re-renders**: Componentes optimizados
 
-## 🔧 Configuración Avanzada
-
-### Variables de Entorno
-
-```env
-# Configuración de OpenAI
-REACT_APP_OPENAI_API_KEY=sk-...
-REACT_APP_OPENAI_MODEL=gpt-5-mini
-
-# Configuración de la API
-REACT_APP_CHAT_API_URL=https://tu-dominio.vercel.app/api/chat
-
-# Configuración de la aplicación
-PASSWORD_MIN_LENGTH=4
-REACT_APP_MAX_MESSAGE_LENGTH=4000
-```
-
 ### Personalización de Estilos
 
 La aplicación usa Tailwind CSS. Para personalizar:
@@ -197,66 +179,9 @@ La aplicación usa Tailwind CSS. Para personalizar:
 2. Modificar `src/index.css` para estilos globales
 3. Usar clases de Tailwind en los componentes
 
-## 🧪 Testing
-
-```bash
-# Ejecutar tests
-npm test
-
-# Tests en modo watch
-npm test -- --watch
-
-# Tests con coverage
-npm test -- --coverage
-```
-
 ## 📦 Scripts Disponibles
 
 - `npm start`: Ejecuta la aplicación en modo desarrollo
 - `npm build`: Construye la aplicación para producción
-- `npm test`: Ejecuta los tests
-- `npm eject`: Expone la configuración de webpack (irreversible)
 
-## 🚀 Despliegue
 
-### Build de Producción
-
-```bash
-npm run build
-```
-
-El directorio `build/` contendrá la aplicación optimizada para producción.
-
-### Despliegue en Vercel
-
-1. Conectar tu repositorio a Vercel
-2. Configurar variables de entorno
-3. Desplegar automáticamente en cada push
-
-### Despliegue Manual
-
-Subir el contenido del directorio `build/` a tu servidor web.
-
-## 🤝 Contribución
-
-1. Fork del repositorio
-2. Crear rama para feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit de cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Crear Pull Request
-
-## 📝 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
-
-## 🆘 Soporte
-
-Para soporte técnico o preguntas:
-
-- Crear un issue en el repositorio
-- Revisar la documentación de la API
-- Verificar la configuración de variables de entorno
-
----
-
-**Nota**: Esta aplicación es un MVP (Minimum Viable Product) diseñado para demostrar capacidades de chat con IA. Para uso en producción, se recomienda implementar medidas de seguridad adicionales y optimizaciones de performance.

@@ -36,17 +36,17 @@ export function RevelacionesProvider({ children }) {
       return;
     }
 
-    console.log('🔄 Cargando revelaciones para userId:', authState.userId);
+    console.log('Cargando revelaciones para userId:', authState.userId);
     setLoading(true);
     setOperationState('loadList', { loading: true, error: null });
     
     try {
       const { data, error, status } = await getUserRevelaciones(authState.userId);
-      console.log('📡 Respuesta de API:', { data, error, status });
+      console.log('Respuesta de API:', { data, error, status });
       
       // Si es 404, significa que no hay revelaciones para este usuario (caso válido)
       if (status === 404) {
-        console.log('ℹ️ No hay revelaciones (404) - caso válido');
+        console.log('No hay revelaciones (404) - caso válido');
         setList([]);
         setById({});
         setOperationState('loadList', { loading: false, error: null });
@@ -55,7 +55,7 @@ export function RevelacionesProvider({ children }) {
       }
       
       if (error) {
-        console.log('❌ Error en API:', error);
+        console.log('Error en API:', error);
         setOperationState('loadList', { loading: false, error: error.message });
         setError(error.message);
         setLoading(false);
@@ -63,21 +63,21 @@ export function RevelacionesProvider({ children }) {
       }
       
       if (data) {
-        console.log('✅ Revelaciones cargadas:', data);
+        console.log('Revelaciones cargadas:', data);
         setList(data);
         setById((prev) => ({
           ...prev,
           ...Object.fromEntries(data.map((it) => [it.id, it])),
         }));
       } else {
-        console.log('ℹ️ No hay datos en la respuesta');
+        console.log('No hay datos en la respuesta');
         setList([]);
         setById({});
       }
       
       setOperationState('loadList', { loading: false, error: null });
     } catch (err) {
-      console.error('💥 Error inesperado cargando revelaciones:', err);
+      console.error('Error inesperado cargando revelaciones:', err);
       setOperationState('loadList', { loading: false, error: 'Error inesperado al cargar' });
       setError('Error inesperado al cargar');
     }
@@ -126,17 +126,17 @@ export function RevelacionesProvider({ children }) {
       userId: authState.userId
     };
 
-    console.log('🆕 Creando revelación:', revelacionData);
+    console.log('Creando revelación:', revelacionData);
     setLoading(true);
     setOperationState('create', { loading: true, error: null });
     
     try {
       const { data: newRevelacion, error, status } = await postRevelacion(revelacionData);
-      console.log('📡 Respuesta de creación:', { newRevelacion, error, status });
+      console.log('Respuesta de creación:', { newRevelacion, error, status });
       
       if (error || status >= 400) {
         const errorMessage = error?.message || `Error ${status}: No se pudo crear la conversación`;
-        console.log('❌ Error creando revelación:', errorMessage);
+        console.log('Error creando revelación:', errorMessage);
         setOperationState('create', { loading: false, error: errorMessage });
         setError(errorMessage);
         setLoading(false);
@@ -144,7 +144,7 @@ export function RevelacionesProvider({ children }) {
       }
       
       if (newRevelacion) {
-        console.log('✅ Revelación creada exitosamente:', newRevelacion);
+        console.log('Revelación creada exitosamente:', newRevelacion);
         // Verificar que no exista ya en la lista para evitar duplicados
         const exists = list.some(item => item.id === newRevelacion.id);
         if (!exists) {
@@ -158,12 +158,12 @@ export function RevelacionesProvider({ children }) {
       }
       
       const errorMessage = 'No se recibieron datos de la conversación creada';
-      console.log('⚠️ Sin datos en respuesta:', errorMessage);
+      console.log('Sin datos en respuesta:', errorMessage);
       setOperationState('create', { loading: false, error: errorMessage });
       setLoading(false);
       return { success: false, error: errorMessage };
     } catch (err) {
-      console.error('💥 Error inesperado creando revelación:', err);
+      console.error('Error inesperado creando revelación:', err);
       const errorMessage = err.message || 'Error inesperado al crear la conversación';
       setOperationState('create', { loading: false, error: errorMessage });
       setError(errorMessage);

@@ -5,6 +5,7 @@ import { AuthProvider } from "./app/AuthContext";
 import { RevelacionesProvider } from "./app/RevelacionesContext";
 import { ToastProvider } from "./app/ToastContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Header from "./components/Header";
 
 import LoginPage from "./pages/LoginPage";
 import RevelacionesList from "./pages/RevelacionesList";
@@ -17,6 +18,7 @@ function App() {
       <RevelacionesProvider>
         <ToastProvider>
           <BrowserRouter>
+            <Header />
             <Routes>
               {/* Público */}
               <Route path="/login" element={<LoginPage />} />
