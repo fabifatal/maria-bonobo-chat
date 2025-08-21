@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Importar variables de colores del tema */
+@import './App.css';
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -9,9 +12,43 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-light);
+  color: var(--text-dark);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+/* Aplicar tema rosado a elementos HTML base */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-dark);
+}
+
+a {
+  color: var(--primary-pink);
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary-pink-dark);
+}
+
+/* Scrollbar personalizada con tema rosado */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-pink-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-pink);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-pink-dark);
 }
